@@ -17,7 +17,7 @@ export default new Vuex.Store({
             canMove: true,
             bombs: 3,
             bombsDropped: 0,
-            bombLength: 2,
+            bombLength: 1,
             isDead: false,
             win: false,
             hasKey: false
