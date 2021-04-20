@@ -8,6 +8,7 @@ export default new Vuex.Store({
         celles2D: [],
         bombs2D: [],
         enemies: [],
+        bonus: [],
         enemiesSpeed: 50,
         enemiesNbr: 7,
         player: {
@@ -18,7 +19,8 @@ export default new Vuex.Store({
             bombsDropped: 0,
             bombLength: 2,
             isDead: false,
-            win: false
+            win: false,
+            hasKey: false
         }
     },
     mutations: {

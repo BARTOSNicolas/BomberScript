@@ -58,43 +58,78 @@ export default {
       return store.state.player.isDead
     }
   },
-  watch:{
-    posX(){
-      this.$refs.player.style.left = this.posX+"0%"
+  watch: {
+    posX() {
+      this.$refs.player.style.left = this.posX + "0%"
       store.state.player.posX = this.posX
-      if(store.state.celles2D[this.posX][this.posY].isDoor){
+      if (store.state.celles2D[this.posX][this.posY].isDoor && store.state.player.hasKey) {
         console.log('You Win')
-        for(let enemi of store.state.enemies){
+        for (let enemi of store.state.enemies) {
           enemi.canMove = false;
         }
         store.state.player.canMove = false;
         store.state.player.win = true;
       }
-      for(let enemi of store.state.enemies){
-        if(this.posX === enemi.posX && this.posY === enemi.posY){
+      for (let enemi of store.state.enemies) {
+        if (this.posX === enemi.posX && this.posY === enemi.posY) {
           store.state.player.canMove = false;
           store.state.player.isDead = true;
+        }
+      }
+      for (let item of store.state.bonus) {
+        if (item.posX === this.posX && item.posY === this.posY) {
+          if (item.bonus === "isKey") {
+            console.log('GOT KEY')
+            store.state.player.hasKey = true;
+            store.state.bonus.splice(store.state.bonus.indexOf(item), 1)
+          } else if (item.bonus === "isBomb") {
+            console.log('GOT BOMB')
+            store.state.player.bombs++
+            store.state.bonus.splice(store.state.bonus.indexOf(item), 1)
+          } else if (item.bonus === "isBombArea") {
+            console.log('GOT BOMB AREA')
+            store.state.player.bombLength++
+            store.state.bonus.splice(store.state.bonus.indexOf(item), 1)
+          }
         }
       }
     },
-    posY(){
-      this.$refs.player.style.top = this.posY+"0%"
+    posY() {
+      this.$refs.player.style.top = this.posY + "0%"
       store.state.player.posY = this.posY
-      if(store.state.celles2D[this.posX][this.posY].isDoor){
+      if (store.state.celles2D[this.posX][this.posY].isDoor && store.state.player.hasKey) {
         console.log('You Win')
-        for(let enemi of store.state.enemies){
+        for (let enemi of store.state.enemies) {
           enemi.canMove = false;
         }
         store.state.player.canMove = false;
         store.state.player.win = true;
       }
-      for(let enemi of store.state.enemies){
-        if(this.posX === enemi.posX && this.posY === enemi.posY){
+      for (let enemi of store.state.enemies) {
+        if (this.posX === enemi.posX && this.posY === enemi.posY) {
           store.state.player.canMove = false;
           store.state.player.isDead = true;
         }
       }
+      for (let item of store.state.bonus) {
+        if (item.posX === this.posX && item.posY === this.posY) {
+          if (item.bonus === "isKey") {
+            console.log('GOT KEY')
+            store.state.player.hasKey = true;
+            store.state.bonus.splice(store.state.bonus.indexOf(item), 1)
+          } else if (item.bonus === "isBomb") {
+            console.log('GOT BOMB')
+            store.state.player.bombs++
+            store.state.bonus.splice(store.state.bonus.indexOf(item), 1)
+          } else if (item.bonus === "isBombArea") {
+            console.log('GOT BOMB AREA')
+            store.state.player.bombLength++
+            store.state.bonus.splice(store.state.bonus.indexOf(item), 1)
+          }
+        }
+      }
     }
+
   },
   mounted(){
     window.addEventListener("keydown", (e)=>{

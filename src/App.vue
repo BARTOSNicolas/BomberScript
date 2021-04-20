@@ -6,11 +6,13 @@
         <li>Use the arrow keys to move</li>
         <li>Press space key to drop a bomb</li>
         <li>Keep away from the bomb</li>
-        <li>Find the exit</li>
+        <li>Kill the enemies to find the key and the exit behind the blocks</li>
       </ul>
     </header>
     <div class="stats" :class="[isWin ? 'win' : '', isDead ? 'dead' : '']">
       <p v-if="!isDead && !isWin">Bombs: {{bombsDropped}}/ {{totalBombs}}</p>
+      <p v-if="!isDead && !isWin">BombsLength: {{bombLength}}</p>
+      <p v-if="!isDead && !isWin">Key: {{hasKey ? 'Yesy' : 'No'}}</p>
       <p v-if="isDead">YOU LOSE</p>
       <p v-if="isWin">YOU WIN</p>
     </div>
@@ -42,6 +44,12 @@ export default {
     },
     isWin(){
       return store.state.player.win
+    },
+    hasKey(){
+      return store.state.player.hasKey
+    },
+    bombLength(){
+      return store.state.player.bombLength
     }
   },
   methods:{
@@ -93,6 +101,15 @@ export default {
     border-right-color: #B3A98B;
     //BGC
     background-color: #D9CDA9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    p{
+      margin: 0;
+      padding: 0;
+      font-size: 14px;
+    }
     &.win{
       background-color: olive
     }

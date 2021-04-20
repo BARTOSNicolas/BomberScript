@@ -17,6 +17,7 @@ name: "Enemi.vue",
       id: this.enemi.id,
       posX: this.enemi.posX,
       posY: this.enemi.posY,
+      bonus: this.enemi.bonus
     }
   },
   computed:{
@@ -205,6 +206,15 @@ name: "Enemi.vue",
         }
       }
     },
+    dropBonus(){
+      const item = {
+        id: this.id,
+        posX: this.posX,
+        posY: this.posY,
+        bonus: this.bonus
+      }
+      store.state.bonus.push(item)
+    }
   },
   mounted() {
     this.$refs.enemi.style.left = this.posX+"0%";
@@ -212,6 +222,9 @@ name: "Enemi.vue",
   },
   created() {
     this.randomWay();
+  },
+  beforeDestroy() {
+    this.dropBonus();
   }
 }
 </script>

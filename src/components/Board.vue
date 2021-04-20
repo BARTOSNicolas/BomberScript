@@ -8,7 +8,8 @@
       <div class="cellLine" v-for="(line, id) in celles2D" :key="id+'cX'">
         <cell v-for="(cell, id) in line" :key="id+'cY'" :cell="cell"></cell>
       </div>
-      <enemi v-for="(enemi) in enemies" :key="enemi.id+'E'" :enemi="enemi"></enemi>
+      <enemi v-for="enemi in enemies" :key="enemi.id+'E'" :enemi="enemi"></enemi>
+      <bonus v-for="item in bonus" :key="item.id" :item="item" ></bonus>
     </div>
   </div>
 </template>
@@ -21,6 +22,8 @@ import Cell from "./Cell"
 import Player from "./Player";
 import Bomb from "./Bomb";
 import Enemi from "./Enemi";
+import Bonus from "./Bonus";
+
 
 export default {
   name: "Board.vue",
@@ -29,13 +32,15 @@ export default {
     Cell,
     Player,
     Bomb,
+    Bonus
   },
   data (){
     return{
       bombs: [],
       celles2D: store.state.celles2D,
       bombs2D: store.state.bombs2D,
-      enemies: store.state.enemies
+      enemies: store.state.enemies,
+      bonus: store.state.bonus
     }
   },
   methods:{
@@ -110,6 +115,14 @@ export default {
       function create(i){
         const randX = getRandomInt(4,10);
         const randY = getRandomInt(4,10);
+        let bonus;
+        if(i===0){
+          bonus = 'isKey'
+        }else if(i%2 === 0){
+          bonus = 'isBomb'
+        }else{
+          bonus = 'isBombArea'
+        }
         if(!store.state.celles2D[randX][randY].isBlock){
           store.state.enemies.push({
             id: i,
@@ -117,6 +130,7 @@ export default {
             posY: randY,
             canMove: true,
             isDead: false,
+            bonus: bonus
           })
         }else{
           create(i)
@@ -137,9 +151,6 @@ export default {
       this.createEnemies()
       console.log(store.state.enemies)
     },2000)
-
-
-
   },
 }
 </script>
