@@ -28,7 +28,6 @@ export default {
   mounted() {
     this.$refs.bonus.style.left = this.posX+"0%";
     this.$refs.bonus.style.top = this.posY+"0%";
-    console.log(this.posX, this.posY)
   }
 }
 </script>
@@ -36,7 +35,6 @@ export default {
 <style scoped lang="scss">
 .bonus{
   position: absolute;
-  z-index: 10;
   top: 0;
   left: 0;
   width: 10%;
@@ -49,18 +47,21 @@ export default {
     width: 80%;
     height: 80%;
     &.key{
+      z-index: 10;
       background: url("../assets/key.svg");
       background-size: contain;
       background-position: center center;
       background-repeat: no-repeat;
     }
     &.bomb{
+      z-index: 8;
       background: url("../assets/bomb.svg");
       background-size: contain;
       background-position: center center;
       background-repeat: no-repeat;
     }
     &.bomb-area{
+      z-index: 7;
       background: url("../assets/explode.svg");
       background-size: contain;
       background-position: center center;

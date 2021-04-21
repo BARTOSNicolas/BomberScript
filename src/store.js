@@ -5,12 +5,13 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
+        level : 1,
+        enemiesSpeed: 100,
+        enemiesNbr: 3,
         celles2D: [],
         bombs2D: [],
         enemies: [],
         bonus: [],
-        enemiesSpeed: 50,
-        enemiesNbr: 7,
         player: {
             posX: 0,
             posY: 0,
@@ -23,12 +24,4 @@ export default new Vuex.Store({
             hasKey: false
         }
     },
-    mutations: {
-        addCelles2D (state, cell) {
-            state.celles2D.push(cell)
-        },
-        addBomb2D (state, cell) {
-            state.celles2D.push(cell)
-        }
-    }
 })

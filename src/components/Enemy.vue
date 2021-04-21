@@ -1,5 +1,5 @@
 <template>
-  <div class="enemi" ref="enemi">
+  <div class="enemy" ref="enemy">
     <div class="design" :class="isDead ? 'dead' : ''"></div>
   </div>
 </template>
@@ -8,77 +8,96 @@
 import store from '../store'
 
 export default {
-name: "Enemi.vue",
+name: "Enemy.vue",
   props:{
-    enemi: Object,
+    enemy: Object,
   },
   data(){
     return{
-      id: this.enemi.id,
-      posX: this.enemi.posX,
-      posY: this.enemi.posY,
-      bonus: this.enemi.bonus
+      id: this.enemy.id,
+      posX: this.enemy.posX,
+      posY: this.enemy.posY,
+      bonus: this.enemy.bonus
     }
   },
   computed:{
      isDead(){
-       return store.state.enemies.some(item => {
-         if(item.id === this.id){
-           return item.isDead
-         }
-       })
+       const enemy = store.state.enemies.find( enemy => enemy.id === this.id);
+       return enemy.isDead;
      },
     canMove(){
-      return store.state.enemies.some(item => {
-        if(item.id === this.id){
-          return item.canMove
+       // const enemy = store.state.enemies.find( enemy => enemy.id === this.id);
+       // return enemy.canMove;
+      return store.state.enemies.some(enemy => {
+        if (enemy.id === this.id){
+          return enemy.canMove
         }
       })
+     },
+    storeX:{
+       get(){
+         const enemy = store.state.enemies.find( enemy => enemy.id === this.id);
+         return enemy.posX;
+      },
+      set(value){
+        const enemy = store.state.enemies.find( enemy => enemy.id === this.id);
+        enemy.posX = value;
+      }
     },
-
+    storeY:{
+      get(){
+        const enemy = store.state.enemies.find( enemy => enemy.id === this.id);
+        return enemy.posY;
+      },
+      set(value){
+        const enemy = store.state.enemies.find( enemy => enemy.id === this.id);
+        enemy.posY = value;
+      }
+    },
   },
   watch:{
     posX(val, oldval){
-      this.$refs.enemi.style.left = this.posX+"0%";
-      if(this.posX === store.state.player.posX && this.posY === store.state.player.posY){
-        store.state.player.canMove = false;
-        store.state.enemiesCanMove = false;
-        store.state.player.isDead = true;
-      }
+      this.$refs.enemy.style.left = this.posX+"0%";
+      this.storeX = val
       if(val < oldval){
-        this.$refs.enemi.style.transform = "rotate(-90deg)";
+        this.$refs.enemy.style.transform = "rotate(-90deg)";
       }else{
-        this.$refs.enemi.style.transform = "rotate(90deg)";
+        this.$refs.enemy.style.transform = "rotate(90deg)";
       }
+      this.checkPlayer();
     },
     posY(val, oldval){
-      this.$refs.enemi.style.top = this.posY+"0%";
-      if(this.posX === store.state.player.posX && this.posY === store.state.player.posY){
-        store.state.player.canMove = false;
-        store.state.enemiesCanMove = false;
-        store.state.player.isDead = true;
-      }
+      this.$refs.enemy.style.top = this.posY+"0%";
+      this.storeY = val
       if(val < oldval){
-        this.$refs.enemi.style.transform = "rotate(0deg)";
+        this.$refs.enemy.style.transform = "rotate(0deg)";
       }else{
-        this.$refs.enemi.style.transform = "rotate(180deg)";
+        this.$refs.enemy.style.transform = "rotate(180deg)";
       }
+      this.checkPlayer();
     },
   },
   methods: {
-    enemiUp() {
+    checkPlayer(){
+      store.state.enemies.forEach(enemy => {
+        if(enemy.id === this.id){
+          if(this.posX === store.state.player.posX && this.posY === store.state.player.posY){
+            store.state.player.canMove = false;
+            store.state.enemiesCanMove = false;
+            store.state.player.isDead = true;
+            console.log('KILL BY ENEMY')
+          }
+        }
+      })
+    },
+    enemyUp() {
       if (this.posY !== 0) {
         if (!store.state.celles2D[this.posX][this.posY - 1].isBlock) {
           if (!store.state.bombs2D[this.posX][this.posY - 1].isDrop) {
             if (this.canMove) {
               this.posY--;
-              store.state.enemies.forEach(enemi => {
-                if(enemi.id === this.id){
-                  enemi.posY = this.posY
-                }
-              })
               setTimeout(() => {
-                this.enemiUp();
+                this.enemyUp();
               }, store.state.enemiesSpeed * 10)
             }
           } else {
@@ -97,19 +116,14 @@ name: "Enemi.vue",
         }, store.state.enemiesSpeed * 10)
       }
     },
-    enemiDown() {
+    enemyDown() {
       if (this.posY !== 9) {
         if (!store.state.celles2D[this.posX][this.posY + 1].isBlock) {
           if (!store.state.bombs2D[this.posX][this.posY + 1].isDrop) {
             if (this.canMove) {
               this.posY++;
-              store.state.enemies.forEach(enemi => {
-                if(enemi.id === this.id){
-                  enemi.posY = this.posY
-                }
-              })
               setTimeout(() => {
-                this.enemiDown();
+                this.enemyDown();
               }, store.state.enemiesSpeed * 10)
             }
           } else {
@@ -128,20 +142,14 @@ name: "Enemi.vue",
         }, store.state.enemiesSpeed * 10)
       }
     },
-    enemiRight() {
+    enemyRight() {
       if (this.posX !== 9) {
         if (!store.state.celles2D[this.posX + 1][this.posY].isBlock) {
           if (!store.state.bombs2D[this.posX + 1][this.posY].isDrop) {
             if (this.canMove) {
               this.posX++;
-              store.state.enemies.forEach(enemi => {
-                if(enemi.id === this.id){
-                  enemi.posX = this.posX
-                }
-              })
-              // this.$refs.enemi.style.transform = "rotate(90deg)";
               setTimeout(() => {
-                this.enemiRight();
+                this.enemyRight();
               }, store.state.enemiesSpeed * 10)
             }
           } else {
@@ -160,20 +168,14 @@ name: "Enemi.vue",
         }, store.state.enemiesSpeed * 10)
       }
     },
-    enemiLeft() {
+    enemyLeft() {
       if (this.posX !== 0) {
         if (!store.state.celles2D[this.posX - 1][this.posY].isBlock) {
           if (!store.state.bombs2D[this.posX - 1][this.posY].isDrop) {
             if (this.canMove) {
               this.posX--;
-              store.state.enemies.forEach(enemi => {
-                if(enemi.id === this.id){
-                  enemi.posX = this.posX
-                }
-              })
-              // this.$refs.enemi.style.transform = "rotate(-90deg)";
               setTimeout(() => {
-                this.enemiLeft();
+                this.enemyLeft();
               }, store.state.enemiesSpeed * 10)
             }
           } else {
@@ -196,13 +198,13 @@ name: "Enemi.vue",
       if (this.canMove) {
         let random = Math.floor(Math.random() * 4);
         if (random === 0) {
-          this.enemiUp();
+          this.enemyUp();
         } else if (random === 1) {
-          this.enemiDown();
+          this.enemyDown();
         } else if (random === 2) {
-          this.enemiRight();
+          this.enemyRight();
         } else if (random === 3) {
-          this.enemiLeft();
+          this.enemyLeft();
         }
       }
     },
@@ -217,11 +219,11 @@ name: "Enemi.vue",
     }
   },
   mounted() {
-    this.$refs.enemi.style.left = this.posX+"0%";
-    this.$refs.enemi.style.top = this.posY+"0%";
-  },
-  created() {
-    this.randomWay();
+    this.$refs.enemy.style.left = this.posX+"0%";
+    this.$refs.enemy.style.top = this.posY+"0%";
+    setTimeout(()=>{
+      this.randomWay();
+    },2000)
   },
   beforeDestroy() {
     this.dropBonus();
@@ -230,7 +232,7 @@ name: "Enemi.vue",
 </script>
 
 <style scoped lang="scss">
-  .enemi{
+  .enemy{
     position: absolute;
     z-index: 10;
     top: 0;

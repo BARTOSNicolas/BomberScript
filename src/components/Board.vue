@@ -8,7 +8,7 @@
       <div class="cellLine" v-for="(line, id) in celles2D" :key="id+'cX'">
         <cell v-for="(cell, id) in line" :key="id+'cY'" :cell="cell"></cell>
       </div>
-      <enemi v-for="enemi in enemies" :key="enemi.id+'E'" :enemi="enemi"></enemi>
+      <enemi v-for="enemy in enemies" :key="enemy.id+'E'" :enemy="enemy"></enemi>
       <bonus v-for="item in bonus" :key="item.id" :item="item" ></bonus>
     </div>
   </div>
@@ -21,12 +21,13 @@ import store from '../store'
 import Cell from "./Cell"
 import Player from "./Player";
 import Bomb from "./Bomb";
-import Enemi from "./Enemi";
+import Enemi from "./Enemy";
 import Bonus from "./Bonus";
 
 
 export default {
   name: "Board.vue",
+  props:["newGame"],
   components:{
     Enemi,
     Cell,
@@ -34,17 +35,71 @@ export default {
     Bomb,
     Bonus
   },
-  data (){
-    return{
-      bombs: [],
-      celles2D: store.state.celles2D,
-      bombs2D: store.state.bombs2D,
-      enemies: store.state.enemies,
-      bonus: store.state.bonus
+  computed:{
+    celles2D:{
+      get(){
+        return store.state.celles2D;
+      },
+      set(value){
+        store.state.celles2D = value;
+      }
+    },
+    bombs2D:{
+      get(){
+        return store.state.bombs2D;
+      },
+      set(value){
+        store.state.bombs2D = value
+      }
+    },
+    enemies:{
+      get(){
+        return store.state.enemies;
+      },
+      set(value){
+        store.state.enemies = value;
+      }
+    },
+    bonus:{
+      get(){
+        return store.state.bonus;
+      },
+      set(value){
+        store.state.bonus = value;
+      }
+    },
+    isWin(){
+      return store.state.player.win;
+    },
+    isDead(){
+      return store.state.player.isDead;
+    }
+  },
+  watch:{
+    isWin(val) {
+      setTimeout(() => {
+        if (val) {
+          store.state.level++
+          store.state.enemiesNbr++
+          if (store.state.enemiesSpeed > 10) {
+            store.state.enemiesSpeed = store.state.enemiesSpeed - 5
+          }
+          this.resetGame(store.state.level, store.state.enemiesNbr, store.state.enemiesSpeed)
+          this.createGame()
+        }
+      }, 2200)
+    },
+    isDead(val){
+      setTimeout(() => {
+        if (val) {
+          this.resetGame(store.state.level, store.state.enemiesNbr, store.state.enemiesSpeed)
+          this.createGame()
+        }
+      }, 4200)
     }
   },
   methods:{
-    createGame(){
+    createBrick(){
       for(let x = 0; x < 10; x++){
         for(let y = 0; y < 10; y++){
           const cell = new CellCase(x, y);
@@ -60,47 +115,46 @@ export default {
           store.state.bombs2D[bomb.posX].push(bomb)
         }
       }
-
     },
     checkNeighbours(){
-      for(let line of store.state.celles2D) {
+      for(let line of this.celles2D) {
         for(let cell of line){
-          cell.checkNeighbours(store.state.celles2D)
+          cell.checkNeighbours(this.celles2D)
         }
       }
     },
     checkAllBomb(){
-      for(let line of store.state.bombs2D) {
+      for(let line of this.bombs2D) {
         for(let bomb of line){
-          bomb.setCellBours(store.state.celles2D)
-          bomb.setBombBours(store.state.bombs2D)
+          bomb.setCellBours(this.celles2D)
+          bomb.setBombBours(this.bombs2D)
         }
       }
     },
     randomBlock(){
-      for(let line of store.state.celles2D) {
+      for(let line of this.celles2D) {
         for(let cell of line){
           if ((cell.posX === 0 && cell.posY === 0) || (cell.posX === 0 && cell.posY === 1) || (cell.posX === 1 && cell.posY === 0)) {
             cell.isBlock = false;
           }else{
-            const random = Math.floor(Math.random() * 2)
+            const random = Math.floor(Math.random() * 2);
             if( random === 1){
-              cell.isBlock = true
+              cell.isBlock = true;
             }
           }
         }
       }
     },
-    setOutDoor(){
-        const randX = Math.floor(Math.random() * 10);
-        const randY = Math.floor(Math.random() * 10);
-      for(let line of store.state.celles2D) {
+    setTheDoor(){
+      const randX = Math.floor(Math.random() * 10);
+      const randY = Math.floor(Math.random() * 10);
+      for(let line of this.celles2D) {
         for(let cell of line){
           if(cell.posX === randX && cell.posY === randY){
             if (cell.isBlock && (cell.posX !== 0 && cell.posY !== 0)){
               cell.isDoor = true;
             }else{
-              this.setOutDoor()
+              this.setTheDoor();
             }
           }
         }
@@ -112,17 +166,20 @@ export default {
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min)) + min;
       }
+      store.state.enemies =[];
       function create(i){
-        const randX = getRandomInt(4,10);
-        const randY = getRandomInt(4,10);
+        const randX = getRandomInt(3,10);
+        const randY = getRandomInt(3,10);
+        //Define BONUS
         let bonus;
         if(i===0){
-          bonus = 'isKey'
+          bonus = 'isKey';
         }else if(i%2 === 0){
-          bonus = 'isBomb'
+          bonus = 'isBomb';
         }else{
-          bonus = 'isBombArea'
+          bonus = 'isBombArea';
         }
+        //If X Y no block push Enemy to store
         if(!store.state.celles2D[randX][randY].isBlock){
           store.state.enemies.push({
             id: i,
@@ -131,26 +188,55 @@ export default {
             canMove: true,
             isDead: false,
             bonus: bonus
-          })
+          });
         }else{
-          create(i)
+          create(i);
         }
       }
+      //Create Enemies
       for(let i = 0; i < store.state.enemiesNbr; i++){
-        create(i)
+        setTimeout(()=>{
+          create(i);
+        },i*250)
       }
-    }
+    },
+    resetGame(level = 1, enemies = 3, speed = 100){
+      //Reset Store
+      store.state.celles2D = [];
+      store.state.bombs2D = [];
+      store.state.enemies = [];
+      console.log(store.state.enemies)
+      setTimeout(()=>{
+        this.bonus = [];
+      }, 10)
+      store.state.level = level;
+      store.state.enemiesSpeed = speed;
+      store.state.enemiesNbr = enemies;
+      store.state.player = {
+        posX: 0,
+        posY: 0,
+        canMove: true,
+        bombs: 3,
+        bombsDropped: 0,
+        bombLength: 1,
+        isDead: false,
+        win: false,
+        hasKey: false
+      };
+    },
+    createGame(){
+      this.createBrick();
+      this.randomBlock();
+      this.setTheDoor();
+      this.checkNeighbours();
+      this.checkAllBomb();
+      this.createEnemies();
+
+
+    },
   },
   created() {
-    this.createGame()
-    this.checkNeighbours()
-    this.checkAllBomb()
-    this.randomBlock()
-    this.setOutDoor()
-    setTimeout(()=>{
-      this.createEnemies()
-      console.log(store.state.enemies)
-    },2000)
+    this.createGame();
   },
 }
 </script>

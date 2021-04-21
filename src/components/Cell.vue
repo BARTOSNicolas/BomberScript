@@ -1,6 +1,5 @@
 <template>
   <div class="cell" :class="[block ? 'block': '', isDoor && !block ? 'Door' : '']">
-
   </div>
 </template>
 
@@ -16,12 +15,14 @@ export default {
     return{
       posX: this.cell.posX,
       posY: this.cell.posY,
-      isDoor: this.cell.isDoor,
     }
   },
   computed:{
     block(){
       return store.state.celles2D[this.posX][this.posY].isBlock
+    },
+    isDoor(){
+      return store.state.celles2D[this.posX][this.posY].isDoor
     }
   },
 }
@@ -46,7 +47,10 @@ export default {
       background-color: #D9CDA9;
     }
     &.Door{
-      background-color: blue;
+      background: url('../assets/door.svg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center center;
     }
   }
 </style>

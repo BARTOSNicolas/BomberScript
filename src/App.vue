@@ -10,16 +10,17 @@
       </ul>
     </header>
     <div class="stats" :class="[isWin ? 'win' : '', isDead ? 'dead' : '']">
-      <p v-if="!isDead && !isWin">Bombs: {{bombsDropped}}/ {{totalBombs}}</p>
-      <p v-if="!isDead && !isWin">BombsLength: {{bombLength}}</p>
-      <p v-if="!isDead && !isWin">Key: {{hasKey ? 'Yesy' : 'No'}}</p>
+      <p v-if="!isDead && !isWin">Level : {{level}}</p>
+      <p v-if="!isDead && !isWin">Bombs : {{bombsDropped}}/{{totalBombs}}</p>
+      <p v-if="!isDead && !isWin">BombsLength : {{bombLength}}</p>
+      <p v-if="!isDead && !isWin">Enemies : {{enemies}}/{{nbrOfEnemies}}</p>
+      <p v-if="!isDead && !isWin">Key found : {{hasKey ? 'Yes' : 'No'}}</p>
       <p v-if="isDead">YOU LOSE</p>
       <p v-if="isWin">YOU WIN</p>
     </div>
-    <div class="stats reload" @click="reload">
-      <svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path d="M2 12a9 9 0 0 0 9 9c2.39 0 4.68-.94 6.4-2.6l-1.5-1.5A6.706 6.706 0 0 1 11 19c-6.24 0-9.36-7.54-4.95-11.95C10.46 2.64 18 5.77 18 12h-3l4 4h.1l3.9-4h-3a9 9 0 0 0-18 0z" fill="#333028"/></svg>
+    <div class="blur" :class="[isWin ? 'win' : '', isDead ? 'dead' : '']">
+      <board class="board" ></board>
     </div>
-    <board></board>
   </div>
 </template>
 
@@ -34,29 +35,33 @@ export default {
   },
   computed:{
     bombsDropped(){
-      return store.state.player.bombsDropped
+      return store.state.player.bombsDropped;
     },
     totalBombs(){
-      return store.state.player.bombs
+      return store.state.player.bombs;
+    },
+    level(){
+      return store.state.level
+    },
+    nbrOfEnemies(){
+      return store.state.enemiesNbr
+    },
+    enemies(){
+      return store.state.enemies.length
     },
     isDead() {
       return store.state.player.isDead;
     },
     isWin(){
-      return store.state.player.win
+      return store.state.player.win;
     },
     hasKey(){
-      return store.state.player.hasKey
+      return store.state.player.hasKey;
     },
     bombLength(){
-      return store.state.player.bombLength
+      return store.state.player.bombLength;
     }
   },
-  methods:{
-    reload(){
-      document.location.reload();
-    }
-  }
 }
 </script>
 
@@ -66,7 +71,7 @@ export default {
   header{
     height: 200px;
     background-color: #BFB395;
-    margin-bottom: 50px;
+    margin-bottom: 100px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -90,7 +95,7 @@ export default {
     top: 180px;
     left: calc(50% - 100px);
     width: 200px;
-    height: 50px;
+    height: 90px;
     text-align: center;
     border: 5px solid;
     //Light
@@ -121,7 +126,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 50px;
+    width: 60px;
+    height: 60px;
+    top: 200px;
     left: calc(50% + 120px);
     cursor: pointer ;
     svg{
@@ -130,8 +137,46 @@ export default {
       transition: 750ms;
       transform-origin: 18px 20px;
     }
-    &:hover svg{
-      transform: rotate(270deg);
+    &:hover{
+      //Light
+      border-top-color: lighten(#F2E5BD, 5%);
+      border-left-color: lighten(#F2E5BD, 5%);
+      //Dark
+      border-bottom-color: lighten(#B3A98B, 5%);
+      border-right-color: lighten(#B3A98B, 5%);
+      //BGC
+      background-color: lighten(#D9CDA9, 5%);
+    }
+    &:focus{
+      outline: none;
+    }
+    &:disabled{
+      //Light
+      border-top-color: #ADADAD;
+      border-left-color: #ADADAD;
+      //Dark
+      border-bottom-color: #616161;
+      border-right-color: #616161;
+      //BGC
+      background-color: #878787;
+      & svg{
+        opacity: 0.5;
+      }
+    }
+  }
+  @keyframes blur {
+    0%{filter: blur(0px)}
+    70%{filter: blur(100px)}
+    100%{filter: blur(0px)}
+  }
+
+  .blur{
+    filter: blur(0px);
+    &.win{
+      animation: blur 3s forwards;
+    }
+    &.dead{
+      animation: blur 3s 2s forwards;
     }
   }
 }

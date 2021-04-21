@@ -29,13 +29,13 @@ export default {
   watch:{
     explode(val) {
       if (val) {
-        for (let enemi of store.state.enemies) {
-          if (enemi.posX === this.posX) {
-            if(enemi.posY === this.posY){
-              enemi.isDead = true;
-              enemi.canMove = false;
+        for (let enemy of store.state.enemies) {
+          if (enemy.posX === this.posX) {
+            if(enemy.posY === this.posY){
+              enemy.isDead = true;
+              enemy.canMove = false;
               setTimeout(()=>{
-                store.state.enemies.splice(store.state.enemies.indexOf(enemi), 1)
+                store.state.enemies.splice(store.state.enemies.indexOf(enemy), 1)
               },500)
 
             }
@@ -44,7 +44,7 @@ export default {
         if (store.state.player.posX === this.posX && store.state.player.posY === this.posY) {
           store.state.player.canMove = false;
           store.state.player.isDead = true;
-          console.log('YOU LOSE')
+          console.log('KILL BY BOMB')
         }
         if (store.state.celles2D[this.posX][this.posY].isBlock && val) {
           setTimeout(() => {
@@ -76,32 +76,35 @@ export default {
   95%{background: radial-gradient(circle at 35% 35%, rgba(242,123,19,1) 0%, rgba(191,62,15,1) 16%, rgba(115,29,9,1) 100%);}
   100%{background: radial-gradient(circle at 35% 35%, rgba(64,64,64,1) 0%, rgba(38,37,38,1) 16%, rgba(0,0,0,1) 100%);}
 }
-  .bomb{
-    opacity: 0;
-    z-index: 4;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 10%;
-    height: 10%;
-    &.dropped{
-      opacity: 1;
-      .design{
-        position: relative;
-        top: 10%;
-        left: 10%;
-        width: 80%;
-        height: 80%;
-        background: radial-gradient(circle at 35% 35%, rgba(64,64,64,1) 0%, rgba(38,37,38,1) 16%, rgba(0,0,0,1) 100%);
-        border-radius: 50%;
-        animation: bomb 2s forwards;
-      }
-    }
-    &.explode{
-      opacity: 0.75;
-      background-image: url("../assets/bomb.gif");
-      background-size: cover;
-    }
 
+.bomb {
+  opacity: 0;
+  z-index: 20;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10%;
+  height: 10%;
+
+  &.dropped {
+    opacity: 1;
+
+    .design {
+      position: relative;
+      top: 15%;
+      left: 15%;
+      width: 70%;
+      height: 70%;
+      background: radial-gradient(circle at 35% 35%, rgba(64, 64, 64, 1) 0%, rgba(38, 37, 38, 1) 16%, rgba(0, 0, 0, 1) 100%);
+      border-radius: 50%;
+      animation: bomb 2s forwards;
+    }
   }
+
+  &.explode {
+    opacity: 0.75;
+    background-image: url("../assets/bomb.gif");
+    background-size: cover;
+  }
+}
 </style>
